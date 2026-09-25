@@ -1,0 +1,25 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+
+# Environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+Desktop.ini
+
+# Large training weights & scratch data (keep best.pt intact)
+*.log
+scratch/

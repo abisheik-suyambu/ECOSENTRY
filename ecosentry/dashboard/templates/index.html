@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECOSENTRY — Live Environmental Disaster Monitoring Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0d121a;
+      --bg-card: #151c27;
+      --bg-card-subtle: #1e2837;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(255, 255, 255, 0.2);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-red: #ef4444;
+      --accent-red-glow: rgba(239, 68, 68, 0.25);
+      --accent-amber: #f59e0b;
+      --accent-amber-glow: rgba(245, 158, 11, 0.25);
+      --accent-green: #10b981;
+      --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Header Nav */
+    header {
+      background-color: rgba(21, 28, 39, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #ef4444, #f59e0b);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #fff;
+      box-shadow: 0 0 15px var(--accent-red-glow);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .brand-subtitle {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background-color: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-green);
+      border-radius: 50%;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 8px var(--accent-green); }
+      100% { transform: scale(0.9); opacity: 0.6; }
+    }
+
+    .sim-btn {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #fff;
+      border: none;
+      padding: 0.55rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px var(--accent-red-glow);
+    }
+
+    .sim-btn:hover {
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      transform: translateY(-1px);
+    }
+
+    .sim-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1440px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem 2rem;
+    }
+
+    /* Emergency Alert Banner */
+    .alert-banner {
+      background-color: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      padding: 1.2rem 1.6rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .alert-banner.danger {
+      border-color: var(--accent-red);
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(21, 28, 39, 0.95));
+      box-shadow: 0 0 20px var(--accent-red-glow);
+    }
+
+    .alert-banner.warning {
+      border-color: var(--accent-amber);
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.15), rgba(21, 28, 39, 0.95));
+      box-shadow: 0 0 20px var(--accent-amber-glow);
+    }
+
+    .alert-banner.normal {
+      border-color: var(--accent-green);
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), rgba(21, 28, 39, 0.95));
+    }
+
+    .alert-info h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .badge {
+      padding: 0.25rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-danger { background-color: var(--accent-red); color: #fff; }
+    .badge-warning { background-color: var(--accent-amber); color: #000; }
+    .badge-normal { background-color: var(--accent-green); color: #fff; }
+    .badge-info { background-color: var(--accent-cyan); color: #000; }
+
+    .alert-assessment {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      margin-top: 0.35rem;
+    }
+
+    .alert-timestamp {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* Grid Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.3rem;
+    }
+
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+
+    @media (max-width: 1024px) {
+      .col-4, .col-6 { grid-column: span 12; }
+    }
+
+    /* Card Component */
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.25rem 1.4rem;
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Metric Rows */
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.52rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .metric-row:last-child {
+      border-bottom: none;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: #fff;
+    }
+
+    .val-highlight {
+      color: var(--accent-red);
+      font-weight: 700;
+    }
+
+    .val-warning {
+      color: var(--accent-amber);
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: var(--bg-card-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+
+    /* Evidence Image Card */
+    .evidence-card {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background-color: var(--bg-card-subtle);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      padding: 0.35rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background-color: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+    }
+
+    .evidence-image-container {
+      background-color: #070a0f;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 0.9rem;
+      border: 1px solid var(--border-subtle);
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .evidence-image-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .detection-list {
+      margin-top: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    .detection-item {
+      background-color: var(--bg-card-subtle);
+      border-radius: 6px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Footer */
+    footer {
+      max-width: 1440px;
+      margin: 2rem auto 1rem;
+      padding: 0 1.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">ES</div>
+      <div>
+        <div class="brand-title">ECOSENTRY</div>
+        <div class="brand-subtitle">SIH26178 — AI Environmental Disaster Command Center</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="live-indicator">
+        <span class="pulse-dot"></span>
+        <span>SYSTEM OPERATIONAL</span>
+      </div>
+      <button class="sim-btn" id="runSimBtn" onclick="triggerSimulation()">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        TRIGGER DRONE SIMULATION
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Emergency Alert Banner -->
+    <section class="alert-banner danger" id="alertBanner">
+      <div class="alert-info">
+        <h2>
+          <span>SYSTEM ALERT:</span>
+          <span class="badge badge-danger" id="statusBadge">FIRE / SMOKE ALERT</span>
+        </h2>
+        <div class="alert-assessment" id="alertAssessment">
+          HIGH CONFIDENCE: Abnormal thermal hotspot corroborated by YOLO visual detection.
+        </div>
+      </div>
+      <div class="alert-timestamp">
+        <div>LATEST TELEMETRY</div>
+        <div id="timestampVal">NO DATA / NOT AVAILABLE</div>
+      </div>
+    </section>
+
+    <!-- Grid Cards -->
+    <div class="dashboard-grid">
+
+      <!-- Card 1: Ground Sensor Station (ESP32) -->
+      <div class="card col-4">
+        <div class="card-header">
+          <span class="card-title">📡 SENSOR NODE (ESP32)</span>
+          <span class="badge badge-info" id="nodeIdBadge">NODE_01</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Investigation Location</span>
+          <span class="metric-value" id="nodeCoords">NO DATA / NOT AVAILABLE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Sensor Temperature</span>
+          <span class="metric-value val-highlight" id="nodeTemp">NO DATA / NOT AVAILABLE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Gas Concentration</span>
+          <span class="metric-value val-warning" id="nodeGas">NO DATA / NOT AVAILABLE</span>
+        </div>
+        <div class="metric-row" style="flex-direction: column; align-items: stretch;">
+          <div style="display: flex; justify-content: space-between;">
+            <span class="metric-label">Soil Moisture / Water Level</span>
+            <span class="metric-value" id="nodeWater">NO DATA / NOT AVAILABLE</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="waterProgress" style="width: 0%; background-color: var(--accent-red);"></div>
+          </div>
+        </div>
+        <div class="metric-row" style="margin-top: 0.5rem;">
+          <span class="metric-label">LoRa Telemetry Uplink</span>
+          <span class="badge badge-warning" id="loraStatus">CRITICAL VIOLATION</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Autonomous Drone Mission -->
+      <div class="card col-4">
+        <div class="card-header">
+          <span class="card-title">🛸 AUTONOMOUS DRONE (UAV)</span>
+          <span class="badge badge-normal" id="droneStateBadge">ON_STATION</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Mission Command</span>
+          <span class="metric-value" style="color: var(--accent-cyan);">INVESTIGATE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Target Station</span>
+          <span class="metric-value" id="droneTarget">NODE_01</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Drone Flight State</span>
+          <span class="metric-value" id="droneFlightState">WAYPOINT REACHED</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Thermal TIR Sensor</span>
+          <span class="metric-value">Active (Dual Capture)</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Visual RGB Sensor</span>
+          <span class="metric-value">Active (Dual Capture)</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Evidence Fusion & Verification -->
+      <div class="card col-4">
+        <div class="card-header">
+          <span class="card-title">⚖️ FUSION & SPATIAL VERIFICATION</span>
+          <span class="badge badge-danger" id="veriBadge">CORROBORATED</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Verification Status</span>
+          <span class="metric-value" id="veriStatus">NO DATA / NOT AVAILABLE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Spatial Overlap Matches</span>
+          <span class="metric-value val-highlight" id="overlapMatches">NO DATA / NOT AVAILABLE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Vegetation Fire Risk</span>
+          <span class="metric-value" id="vegRisk">NO DATA / NOT AVAILABLE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Edge Target Platform</span>
+          <span class="metric-value">Raspberry Pi (Lightweight)</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Radiometric Temperature Hotspots (Physical Celsius) -->
+      <div class="card col-6">
+        <div class="card-header">
+          <span class="card-title">🌡️ RADIOMETRIC TEMPERATURE ANALYSIS (°C)</span>
+          <span class="badge badge-danger" id="tempHotspotBadge">3 HOTSPOTS</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Hottest Temperature (Peak)</span>
+          <span class="metric-value val-highlight" id="hottestTemp">NO DATA / NOT AVAILABLE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Hottest Hotspot BBox</span>
+          <span class="metric-value" id="hottestBbox">NO DATA / NOT AVAILABLE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Anomaly Threshold</span>
+          <span class="metric-value">70.0 °C (Configurable)</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Data Mode</span>
+          <span class="metric-value" style="color: var(--accent-amber);">[SYNTHETIC TEST DATA] 2D Matrix</span>
+        </div>
+      </div>
+
+      <!-- Card 5: YOLOv8 Visual AI (best.pt) -->
+      <div class="card col-6">
+        <div class="card-header">
+          <span class="card-title">👁️ YOLOv8 VISUAL AI (MODEL: best.pt)</span>
+          <span class="badge badge-danger" id="yoloCountBadge">2 FIRE / 0 SMOKE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Fire Detection Confidence</span>
+          <span class="metric-value val-highlight" id="yoloFireConf">NO DATA / NOT AVAILABLE</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Smoke Detection Confidence</span>
+          <span class="metric-value" id="yoloSmokeConf">0.00 (No Smoke)</span>
+        </div>
+        <div class="detection-list" id="yoloList">
+          <div class="detection-item" style="color: var(--text-muted);">NO DATA / NOT AVAILABLE</div>
+        </div>
+      </div>
+
+      <!-- Card 6: Auditable Evidence Gallery (Full Width) -->
+      <div class="card col-12 evidence-card">
+        <div class="card-header">
+          <span class="card-title">📸 AUDITABLE MULTI-PANEL EVIDENCE GALLERY</span>
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchEvidenceTab('composite')">Composite Summary</button>
+            <button class="tab-btn" onclick="switchEvidenceTab('temperature')">Radiometric Temperature Map (°C)</button>
+            <button class="tab-btn" onclick="switchEvidenceTab('thermal')">Relative Thermal Anomalies</button>
+            <button class="tab-btn" onclick="switchEvidenceTab('yolo')">YOLO Fire / Smoke</button>
+          </div>
+        </div>
+        <div class="evidence-image-container">
+          <img id="evidenceImg" src="/results/composite_evidence.png?t=1" alt="Auditable Disaster Evidence">
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    ECOSENTRY Disaster Management Software Prototype — Developed for SIH26178 — Resilient, AI-Powered Environmental Monitoring Network
+  </footer>
+
+  <script>
+    let currentEvidenceTab = 'composite';
+
+    function switchEvidenceTab(tab) {
+      currentEvidenceTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const img = document.getElementById('evidenceImg');
+      const timestamp = new Date().getTime();
+
+      if (tab === 'composite') {
+        img.src = '/results/composite_evidence.png?t=' + timestamp;
+      } else if (tab === 'temperature') {
+        img.src = '/results/thermal_temperature_evidence.png?t=' + timestamp;
+      } else if (tab === 'thermal') {
+        img.src = '/results/thermal_hotspot_evidence.png?t=' + timestamp;
+      } else if (tab === 'yolo') {
+        img.src = '/results/yolo_fire_detection.png?t=' + timestamp;
+      }
+    }
+
+    async function fetchAlertData() {
+      try {
+        const response = await fetch('/api/alert');
+        const data = await response.json();
+        updateUI(data);
+      } catch (err) {
+        console.error('Error fetching alert data:', err);
+      }
+    }
+
+    function updateUI(data) {
+      if (!data || data.error) return;
+
+      const fallback = "NO DATA / NOT AVAILABLE";
+
+      // Status Badge & Banner
+      const statusBadge = document.getElementById('statusBadge');
+      const alertBanner = document.getElementById('alertBanner');
+      const statusStr = data.status || 'NORMAL';
+
+      statusBadge.textContent = statusStr;
+      document.getElementById('alertAssessment').textContent = data.assessment || fallback;
+      document.getElementById('timestampVal').textContent = data.timestamp ? data.timestamp.replace('T', ' ').substring(0, 19) : fallback;
+
+      if (statusStr.includes('FIRE')) {
+        alertBanner.className = 'alert-banner danger';
+        statusBadge.className = 'badge badge-danger';
+      } else if (statusStr.includes('ANOMALY') || statusStr.includes('WARNING')) {
+        alertBanner.className = 'alert-banner warning';
+        statusBadge.className = 'badge badge-warning';
+      } else {
+        alertBanner.className = 'alert-banner normal';
+        statusBadge.className = 'badge badge-normal';
+      }
+
+      // Sensor Metrics
+      document.getElementById('nodeIdBadge').textContent = data.node_id || fallback;
+      document.getElementById('nodeCoords').textContent = (data.latitude && data.longitude) ? `${data.latitude}, ${data.longitude}` : fallback;
+      document.getElementById('nodeTemp').textContent = data.sensor_temperature !== undefined ? `${data.sensor_temperature} (Sensor reading)` : fallback;
+      document.getElementById('nodeGas').textContent = data.gas_level !== undefined ? `${data.gas_level} PPM` : fallback;
+      document.getElementById('nodeWater').textContent = data.water_level !== undefined ? `${data.water_level}%` : fallback;
+
+      const waterProgress = document.getElementById('waterProgress');
+      const waterVal = parseFloat(data.water_level || 0);
+      waterProgress.style.width = `${waterVal}%`;
+      waterProgress.style.backgroundColor = waterVal <= 20 ? 'var(--accent-red)' : 'var(--accent-cyan)';
+
+      // Radiometric Temperature metrics
+      const tempCount = data.temperature_hotspot_count !== undefined ? data.temperature_hotspot_count : 0;
+      document.getElementById('tempHotspotBadge').textContent = `${tempCount} HOTSPOTS`;
+
+      if (data.temperature_max_c !== undefined && data.temperature_max_c !== null) {
+        document.getElementById('hottestTemp').textContent = `${data.temperature_max_c.toFixed(1)} °C`;
+      } else {
+        document.getElementById('hottestTemp').textContent = fallback;
+      }
+
+      // Extract hottest bbox if available
+      if (data.details && data.details.temperature_hotspots && data.details.temperature_hotspots.length > 0) {
+        const topBbox = data.details.temperature_hotspots[0].bbox;
+        document.getElementById('hottestBbox').textContent = `[${topBbox.join(', ')}]`;
+      } else {
+        document.getElementById('hottestBbox').textContent = fallback;
+      }
+
+      // YOLO metrics
+      document.getElementById('yoloCountBadge').textContent = `${data.fire_detections || 0} FIRE / ${data.smoke_detections || 0} SMOKE`;
+
+      const yoloList = document.getElementById('yoloList');
+      if (data.details && data.details.yolo_predictions && data.details.yolo_predictions.length > 0) {
+        let maxFireConf = 0;
+        let maxSmokeConf = 0;
+
+        yoloList.innerHTML = data.details.yolo_predictions.map(p => {
+          if (p.class_name === 'fire' && p.confidence > maxFireConf) maxFireConf = p.confidence;
+          if (p.class_name === 'smoke' && p.confidence > maxSmokeConf) maxSmokeConf = p.confidence;
+
+          return `
+            <div class="detection-item">
+              <span style="color: ${p.class_name === 'fire' ? 'var(--accent-red)' : 'var(--accent-cyan)'}; font-weight: 700;">${p.class_name.toUpperCase()}</span>
+              <span>Confidence: ${(p.confidence || 0).toFixed(2)}</span>
+              <span>[${(p.bbox || []).map(Math.round).join(', ')}]</span>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('yoloFireConf').textContent = maxFireConf > 0 ? `${(maxFireConf * 100).toFixed(1)}%` : "0.0% (None)";
+        document.getElementById('yoloSmokeConf').textContent = maxSmokeConf > 0 ? `${(maxSmokeConf * 100).toFixed(1)}%` : "0.0% (None)";
+      } else {
+        yoloList.innerHTML = `<div class="detection-item" style="color: var(--text-muted);">${fallback}</div>`;
+        document.getElementById('yoloFireConf').textContent = fallback;
+      }
+
+      // Verification metrics
+      document.getElementById('veriStatus').textContent = data.verification_status || fallback;
+      if (data.details) {
+        document.getElementById('overlapMatches').textContent = `${data.details.corroborations || 0} Corroborated Pairs`;
+        document.getElementById('vegRisk').textContent = data.details.vegetation_fire_risk ? 'FLAGGED (Dry Biomass Risk)' : 'NOT FLAGGED';
+        document.getElementById('vegRisk').style.color = data.details.vegetation_fire_risk ? 'var(--accent-red)' : 'var(--text-muted)';
+      }
+    }
+
+    async function triggerSimulation() {
+      const btn = document.getElementById('runSimBtn');
+      btn.disabled = true;
+      btn.innerHTML = 'RUNNING SIMULATION...';
+
+      try {
+        const res = await fetch('/api/trigger-simulation', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          await fetchAlertData();
+          switchEvidenceTab(currentEvidenceTab);
+        } else {
+          alert('Simulation failed: ' + data.error);
+        }
+      } catch (err) {
+        alert('Simulation request error: ' + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          TRIGGER DRONE SIMULATION
+        `;
+      }
+    }
+
+    // Initial fetch & Polling
+    fetchAlertData();
+    setInterval(fetchAlertData, 3000);
+  </script>
+</body>
+</html>

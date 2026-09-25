@@ -1,0 +1,85 @@
+{
+    "status": "FIRE / SMOKE ALERT",
+    "assessment": "HIGH CONFIDENCE: Thermal anomaly corroborated by YOLO visual detection. Radiometric peak temperature confirmed at 287.4\u00b0C. Ground sensors also confirm abnormal temperature/gas levels.",
+    "node_id": "NODE_01",
+    "latitude": 12.9716,
+    "longitude": 80.2209,
+    "sensor_temperature": 68.5,
+    "gas_level": 82.0,
+    "water_level": 15.0,
+    "hotspot_count": 8,
+    "temperature_hotspot_count": 3,
+    "temperature_max_c": 287.4,
+    "fire_detections": 2,
+    "smoke_detections": 0,
+    "verification_status": "CORROBORATED_DISASTER_EVIDENCE",
+    "evidence_path": "composite_evidence.png",
+    "timestamp": "2026-09-25T14:31:08.432008",
+    "details": {
+        "corroborations": 8,
+        "vegetation_fire_risk": false,
+        "strongest_relative_delta": 167.0,
+        "temperature_hotspots": [
+            {
+                "bbox": [
+                    391,
+                    261,
+                    99,
+                    99
+                ],
+                "area": 7522.0,
+                "max_temperature_c": 287.4,
+                "mean_temperature_c": 126.08,
+                "threshold_c": 70.0
+            },
+            {
+                "bbox": [
+                    193,
+                    133,
+                    55,
+                    55
+                ],
+                "area": 2346.0,
+                "max_temperature_c": 128.5,
+                "mean_temperature_c": 88.21,
+                "threshold_c": 70.0
+            },
+            {
+                "bbox": [
+                    148,
+                    338,
+                    25,
+                    25
+                ],
+                "area": 446.0,
+                "max_temperature_c": 84.2,
+                "mean_temperature_c": 74.26,
+                "threshold_c": 70.0
+            }
+        ],
+        "yolo_predictions": [
+            {
+                "class_id": 0,
+                "class_name": "fire",
+                "confidence": 0.6446,
+                "bbox": [
+                    298.68,
+                    177.69,
+                    393.95,
+                    905.69
+                ]
+            },
+            {
+                "class_id": 0,
+                "class_name": "fire",
+                "confidence": 0.3026,
+                "bbox": [
+                    566.77,
+                    736.15,
+                    649.1,
+                    921.2
+                ]
+            }
+        ]
+    }
+}
